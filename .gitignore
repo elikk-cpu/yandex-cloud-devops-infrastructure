@@ -1,0 +1,19 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+
+# Secrets
+*.key
+*.pem
+key.json
+authorized_key.json
+
+# Ansible
+*.retry
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
