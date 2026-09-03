@@ -33,3 +33,7 @@ variable "private_b_cidr" {
   type        = string
 }
 
+variable "admin_cidr" {
+  description = "Public IPv4 address allowed to access administrative services"
+  type        = string
+}

@@ -8,3 +8,5 @@ private_a_cidr = "10.10.20.0/24"
 
 public_b_cidr  = "10.10.30.0/24"
 private_b_cidr = "10.10.40.0/24"
+
+admin_cidr = "46.151.104.41/32"
