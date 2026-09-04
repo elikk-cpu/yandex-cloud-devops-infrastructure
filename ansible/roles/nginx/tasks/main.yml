@@ -1,0 +1,22 @@
+---
+- name: Install nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+  become: true
+
+- name: Enable and start nginx
+  ansible.builtin.service:
+    name: nginx
+    enabled: true
+    state: started
+  become: true
+
+- name: Deploy static website
+  ansible.builtin.copy:
+    src: index.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
