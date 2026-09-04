@@ -1,0 +1,8 @@
+---
+- name: Configure Prometheus server
+  hosts: prometheus
+  become: true
+
+  roles:
+    - common
+    - prometheus
