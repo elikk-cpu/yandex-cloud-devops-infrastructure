@@ -1,0 +1,24 @@
+---
+- name: Install Alertmanager
+  ansible.builtin.apt:
+    name: prometheus-alertmanager
+    state: present
+    update_cache: true
+  become: true
+
+- name: Deploy Alertmanager configuration
+  ansible.builtin.copy:
+    src: alertmanager.yml
+    dest: /etc/prometheus/alertmanager.yml
+    owner: root
+    group: prometheus
+    mode: "0640"
+  become: true
+  notify: Restart Alertmanager
+
+- name: Enable and start Alertmanager
+  ansible.builtin.service:
+    name: prometheus-alertmanager
+    enabled: true
+    state: started
+  become: true

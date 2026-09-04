@@ -1,0 +1,53 @@
+---
+- name: Download Nginx Log Exporter package
+  ansible.builtin.get_url:
+    url: https://github.com/martin-helmich/prometheus-nginxlog-exporter/releases/download/v1.11.0/prometheus-nginxlog-exporter_1.11.0_linux_amd64.deb
+    dest: /tmp/prometheus-nginxlog-exporter.deb
+    mode: "0644"
+
+- name: Install Nginx Log Exporter
+  ansible.builtin.apt:
+    deb: /tmp/prometheus-nginxlog-exporter.deb
+    state: present
+  become: true
+
+- name: Configure Nginx Log Exporter
+  ansible.builtin.template:
+    src: prometheus-nginxlog-exporter.hcl.j2
+    dest: /etc/prometheus-nginxlog-exporter.hcl
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: Restart Nginx Log Exporter
+
+- name: Create systemd override directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/prometheus-nginxlog-exporter.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+- name: Allow Nginx Log Exporter to read nginx logs
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/prometheus-nginxlog-exporter.service.d/override.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Service]
+      CapabilityBoundingSet=CAP_DAC_READ_SEARCH
+      AmbientCapabilities=CAP_DAC_READ_SEARCH
+  become: true
+  notify:
+    - Reload systemd
+    - Restart Nginx Log Exporter
+
+- name: Enable and start Nginx Log Exporter
+  ansible.builtin.service:
+    name: prometheus-nginxlog-exporter
+    enabled: true
+    state: started
+  become: true

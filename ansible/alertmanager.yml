@@ -1,0 +1,7 @@
+---
+- name: Configure Alertmanager
+  hosts: prometheus
+  become: true
+
+  roles:
+    - alertmanager

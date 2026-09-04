@@ -1,0 +1,7 @@
+---
+- name: Configure Nginx Log Exporter
+  hosts: web
+  become: true
+
+  roles:
+    - nginx_log_exporter

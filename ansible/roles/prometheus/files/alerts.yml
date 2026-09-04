@@ -1,0 +1,74 @@
+groups:
+  - name: infrastructure
+    rules:
+
+      - alert: NodeDown
+        expr: up{job="node_exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Node {{ $labels.node }} is down"
+          description: "Node Exporter on {{ $labels.node }} has been unavailable for more than 1 minute."
+
+      - alert: NginxLogExporterDown
+        expr: up{job="nginx_log_exporter"} == 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Nginx Log Exporter on {{ $labels.node }} is down"
+          description: "Nginx Log Exporter on {{ $labels.node }} has been unavailable for more than 1 minute."
+
+      - alert: HighCPUUsage
+        expr: |
+          100 - (
+            avg by (node) (
+              rate(node_cpu_seconds_total{job="node_exporter",mode="idle"}[5m])
+            ) * 100
+          ) > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.node }}"
+          description: "CPU usage has been above 85% for 5 minutes."
+
+      - alert: HighMemoryUsage
+        expr: |
+          (
+            1 -
+            node_memory_MemAvailable_bytes{job="node_exporter"}
+            /
+            node_memory_MemTotal_bytes{job="node_exporter"}
+          ) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.node }}"
+          description: "Memory usage has been above 90% for 5 minutes."
+
+      - alert: HighDiskUsage
+        expr: |
+          100 -
+          (
+            node_filesystem_avail_bytes{
+              job="node_exporter",
+              mountpoint="/",
+              fstype!~"tmpfs|overlay"
+            }
+            /
+            node_filesystem_size_bytes{
+              job="node_exporter",
+              mountpoint="/",
+              fstype!~"tmpfs|overlay"
+            }
+            * 100
+          ) > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High disk usage on {{ $labels.node }}"
+          description: "Root filesystem usage has been above 85% for 10 minutes."

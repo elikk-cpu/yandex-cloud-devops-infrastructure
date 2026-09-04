@@ -147,6 +147,13 @@ resource "yandex_vpc_security_group" "web" {
     security_group_id = yandex_vpc_security_group.prometheus.id
   }
 
+  ingress {
+    protocol          = "TCP"
+    description       = "Nginx Log Exporter metrics from Prometheus"
+    port              = 4040
+    security_group_id = yandex_vpc_security_group.prometheus.id
+  }
+
   egress {
     protocol       = "ANY"
     description    = "Allow outbound traffic"
