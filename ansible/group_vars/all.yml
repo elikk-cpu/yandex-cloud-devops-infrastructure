@@ -1,0 +1,6 @@
+ansible_user: ubuntu
+
+ansible_ssh_private_key_file: /home/aa/.ssh/id_ed25519
+
+ansible_ssh_common_args: >-
+  -o ProxyJump=ubuntu@93.77.181.160
