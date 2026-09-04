@@ -1,0 +1,7 @@
+---
+- name: Configure Node Exporter on web servers
+  hosts: web
+  become: true
+
+  roles:
+    - node_exporter

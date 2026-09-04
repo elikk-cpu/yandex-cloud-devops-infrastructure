@@ -1,0 +1,14 @@
+---
+- name: Install Node Exporter
+  ansible.builtin.apt:
+    name: prometheus-node-exporter
+    state: present
+    update_cache: true
+  become: true
+
+- name: Enable and start Node Exporter
+  ansible.builtin.service:
+    name: prometheus-node-exporter
+    enabled: true
+    state: started
+  become: true
