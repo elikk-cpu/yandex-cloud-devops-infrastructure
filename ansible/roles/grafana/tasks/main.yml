@@ -1,0 +1,40 @@
+---
+- name: Install Grafana dependencies
+  ansible.builtin.apt:
+    name:
+      - adduser
+      - libfontconfig1
+      - musl
+    state: present
+    update_cache: true
+  become: true
+
+- name: Download Grafana package from Yandex mirror
+  ansible.builtin.get_url:
+    url: https://mirror.yandex.ru/mirrors/packages.grafana.com/oss/deb/pool/main/g/grafana/grafana_13.2.1_33191028959_linux_amd64.deb
+    dest: /tmp/grafana.deb
+    checksum: "sha256:b4f088f661c5103746f23cb5cbbe2b2bb2e18ba9870ad68a3c2a90451f511ded"
+    mode: "0644"
+
+- name: Install Grafana package
+  ansible.builtin.apt:
+    deb: /tmp/grafana.deb
+    state: present
+  become: true
+
+- name: Configure Prometheus datasource
+  ansible.builtin.template:
+    src: prometheus-datasource.yml.j2
+    dest: /etc/grafana/provisioning/datasources/prometheus.yml
+    owner: root
+    group: grafana
+    mode: "0640"
+  become: true
+  notify: Restart Grafana
+
+- name: Enable and start Grafana
+  ansible.builtin.service:
+    name: grafana-server
+    enabled: true
+    state: started
+  become: true
