@@ -1,0 +1,9 @@
+---
+- name: Configure Kibana
+  hosts: kibana
+  become: true
+
+  roles:
+    - common
+    - kibana
+

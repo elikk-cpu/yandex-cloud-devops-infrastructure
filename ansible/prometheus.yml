@@ -1,6 +1,6 @@
 ---
 - name: Configure Prometheus server
-  hosts: prometheus
+  hosts: prometheus_servers
   become: true
 
   roles:

@@ -1,0 +1,35 @@
+filebeat.inputs:
+
+  - type: filestream
+    id: nginx-access
+    enabled: true
+    paths:
+      - /var/log/nginx/access.log
+    fields:
+      app_service: nginx
+      log_type: access
+      node: "{{ inventory_hostname }}"
+    fields_under_root: true
+
+  - type: filestream
+    id: nginx-error
+    enabled: true
+    paths:
+      - /var/log/nginx/error.log
+    fields:
+      app_service: nginx
+      log_type: error
+      node: "{{ inventory_hostname }}"
+    fields_under_root: true
+
+output.elasticsearch:
+  hosts:
+    - "http://10.10.20.33:9200"
+
+setup.ilm.enabled: false
+
+setup.template:
+  name: "devops-nginx"
+  pattern: "devops-nginx-*"
+
+output.elasticsearch.index: "devops-nginx-%{+yyyy.MM.dd}"

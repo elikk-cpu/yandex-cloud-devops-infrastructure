@@ -1,0 +1,57 @@
+---
+- name: Install Kibana dependencies
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gnupg
+      - apt-transport-https
+    state: present
+    update_cache: true
+  become: true
+
+- name: Download Elastic GPG key
+  ansible.builtin.get_url:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    dest: /tmp/GPG-KEY-elasticsearch
+    mode: "0644"
+  become: true
+
+- name: Install Elastic GPG key
+  ansible.builtin.shell: |
+    gpg --dearmor --yes \
+      -o /usr/share/keyrings/elasticsearch-keyring.gpg \
+      /tmp/GPG-KEY-elasticsearch
+  args:
+    creates: /usr/share/keyrings/elasticsearch-keyring.gpg
+  become: true
+
+- name: Add Elastic repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://mirror.yandex.ru/mirrors/elastic/9/ stable main"
+    filename: elastic-9.x
+    state: present
+  become: true
+
+- name: Install Kibana
+  ansible.builtin.apt:
+    name: kibana
+    state: present
+    update_cache: true
+  become: true
+
+- name: Deploy Kibana configuration
+  ansible.builtin.template:
+    src: kibana.yml.j2
+    dest: /etc/kibana/kibana.yml
+    owner: root
+    group: kibana
+    mode: "0660"
+  become: true
+  notify: Restart Kibana
+
+- name: Enable and start Kibana
+  ansible.builtin.service:
+    name: kibana
+    enabled: true
+    state: started
+  become: true
